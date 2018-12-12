@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block heading %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        var socket = io.connect('http://127.0.0.1:5000');
+        var article = document.getElementById('channel');
+        var channel = article.dataset.channel;
+        console.log(channel);
+
+        socket.on('message', function(msg) {
+            $("#messages").append('<li>'+msg+'</li>');
+            console.log('Received message');
+        });
+        $('#sendbutton').on('click', function() {
+            var mes = $('#myMessage').val();
+            console.log(mes);
+
+            socket.send($('#myMessage').val());
+            $('#myMessage').val('');
+            socket.emit('submit vote', channel, mes);
+        });
+    });
+
+    ///take date to the message
+    // var d = new Date();
+    // document.getElementById("demo").innerHTML = d;
+</script>
+
+    <h4"> Your channel: {{ notes }} </h4>
+    <p id="channel" data-channel="{{ channel_name }}">{{ channel_name }}<p>
+
+{% endblock %}
+
+{% block body %}
+
+<p id="demo"></p>
+<ul id="messages">
+    {% if notes %}
+        {% for channel in notes %}
+            <li>{{ channel }}</li>
+        {% endfor %}
+    {% endif %}
+</ul>
+
+<input type="text" id="myMessage">
+<button id="sendbutton">Send</button>
+
+{% endblock %}
