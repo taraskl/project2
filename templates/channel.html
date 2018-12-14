@@ -4,45 +4,43 @@
 <script type="text/javascript">
     $(document).ready(function() {
         var socket = io.connect('http://127.0.0.1:5000');
-        var article = document.getElementById('channel');
-        var channel = article.dataset.channel;
-        console.log(channel);
 
-        socket.on('message', function(msg) {
-            $("#messages").append('<li>'+msg+'</li>');
+        socket.on('message', function(data) {
+            $("#messages").append('<li>'+data[1]+', '+data[2]+'</br>'+data[0]+'</li>');
             console.log('Received message');
         });
-        $('#sendbutton').on('click', function() {
-            var mes = $('#myMessage').val();
-            console.log(mes);
 
-            socket.send($('#myMessage').val());
+        $('#sendbutton').on('click', function() {
+            var article = document.getElementById('channel');
+            var channel = article.dataset.channel;
+            // console.log(channel);
+            var d = new Date().toUTCString();
+            var mes = $('#myMessage').val();
+
+            // send broadcast message
+            socket.send(mes, d);
+
             $('#myMessage').val('');
-            socket.emit('submit vote', channel, mes);
+            // send data to save in server side
+            socket.emit('save message', channel, mes, d);
         });
     });
 
-    ///take date to the message
-    // var d = new Date();
-    // document.getElementById("demo").innerHTML = d;
 </script>
 
-    <h4"> Your channel: {{ notes }} </h4>
-    <p id="channel" data-channel="{{ channel_name }}">{{ channel_name }}<p>
+<h4 id="channel" data-channel="{{ channel_name }}"> Your channel: {{ channel_name }} </h4>
 
 {% endblock %}
+{% block body %}    
 
-{% block body %}
-
-<p id="demo"></p>
+<h2>Notes:</h2>
 <ul id="messages">
-    {% if notes %}
-        {% for channel in notes %}
-            <li>{{ channel }}</li>
+    {% if channel_notes %}
+        {% for k, v in channel_notes.items() %}
+                <li> {{ v.date }}, {{ v.user }} </br> {{ v.text }} </li>
         {% endfor %}
     {% endif %}
 </ul>
-
 <input type="text" id="myMessage">
 <button id="sendbutton">Send</button>
 

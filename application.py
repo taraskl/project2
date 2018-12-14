@@ -52,32 +52,40 @@ def channel():
 
 
 @app.route("/channel/<channel_name>",methods=["GET", "POST"])
-
 def channelpage(channel_name):
+    # return last 100 notes from selected channel
     if channel_name in notes:
         channel_notes = notes[channel_name]
-        last_channel_notes = channel_notes[-100:]
-        return render_template("channel.html", channel_name=channel_name, notes=last_channel_notes)
+        # last_channel_notes = channel_notes[-100:]
+        return render_template("channel.html", channel_name=channel_name, channel_notes=channel_notes, notes=notes)
     else:
         return render_template("channel.html", channel_name=channel_name)
 
 
 @socketio.on('message')
-def handleMessage(msg):
+def send_message(mes, d):
+    user= session["user"]
     data = []
-    data.append(msg)
-    for i in data:
-        print('Message: ' + i)
+    data.append(mes)
+    data.append(d)
+    data.append(user)
+    print(data)
+
     send(data, broadcast=True)   
 
-@socketio.on("submit vote")
-def vote(channel, mes):
+@socketio.on("save message")
+def save_message(channel, mes, d):
+    user= session["user"]
     if channel in notes:
-        notes[channel].append(mes)
+        messagescounter = len (notes[channel]) + 1
+        notes[channel][messagescounter] = {}
+        notes[channel][messagescounter]['text']=mes
+        notes[channel][messagescounter]['date']=d
+        notes[channel][messagescounter]['user']=user    
     else:
-        notes[channel] = []
-        notes[channel].append(mes)       
-    print(notes)
-    # selection = data["selection"]
-    # votes[selection] += 1
-    # emit("vote totals", votes, broadcast=True)     
+        messagescounter = 1
+        notes[channel] = {messagescounter: {'text':'', 'date':'', 'user': ''}}
+        notes[channel][messagescounter]['text']=mes
+        notes[channel][messagescounter]['date']=d
+        notes[channel][messagescounter]['user']=user     
+
