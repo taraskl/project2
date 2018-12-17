@@ -24,6 +24,19 @@
             // send data to save in server side
             socket.emit('save message', channel, mes, d);
         });
+
+        $('#deletebutton').on('click', function() {    
+            var messages = document.querySelectorAll("#messages li");
+            var lastIndex= messages.length - 1;  
+            messages[lastIndex].parentNode.removeChild(messages[lastIndex]);
+
+            /// delete message in server
+            var article = document.getElementById('channel');
+            var channel = article.dataset.channel;
+            var index= messages.length
+            socket.emit('delete message', channel, index);
+
+        });    
     });
 
 </script>
@@ -33,7 +46,7 @@
 {% endblock %}
 {% block body %}    
 
-<h2>Notes:</h2>
+<h2>Notes:</h2> 
 <ul id="messages">
     {% if channel_notes %}
         {% for k, v in channel_notes.items() %}

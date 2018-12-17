@@ -87,5 +87,11 @@ def save_message(channel, mes, d):
         notes[channel] = {messagescounter: {'text':'', 'date':'', 'user': ''}}
         notes[channel][messagescounter]['text']=mes
         notes[channel][messagescounter]['date']=d
-        notes[channel][messagescounter]['user']=user     
+        notes[channel][messagescounter]['user']=user   
+
+@socketio.on("delete message")
+def save_message(channel, index):
+    del notes[channel][index]
+
+
 
