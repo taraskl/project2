@@ -14,7 +14,6 @@ Session(app)
 
 channels = []
 notes ={}
-last_chanel=[]
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -24,21 +23,32 @@ def index():
         name = request.form.get("name")
         session["user"] = name
         return render_template("index.html", user= session["user"], channels=channels )
-    
+
     try:
-        last = last_chanel[-1]
-        channel_notes = notes[last]
-        return render_template("channel.html", channel_name=last, channel_notes=channel_notes, notes=notes)
+        if session['last_chanel'] in notes:
+            last = session['last_chanel']
+            channel_notes = notes[last]   
+            return render_template("channel.html", channel_name=last, channel_notes=channel_notes, notes=notes)
+        elif session["user"]:
+            return render_template("index.html", user= session["user"], channels=channels )
+        else:
+            print("Error")
+            return render_template("index.html", channels=channels)
     except:
-        return render_template("index.html", channels=channels)        
+        print("Error 2")
+        return render_template("index.html", channels=channels)
+    # try:
+    #     if session["user"]:
+    #         return render_template("index.html", user= session["user"], channels=channels)
+    # except:
+    #     print("Error 3")
+    #     return render_template("index.html", channels=channels)
 
 
 @app.route("/logout")
 def logout():
     session["user"] = []
-
     return render_template("index.html", user= session["user"]) 
-
 
 @app.route("/channels", methods=["GET", "POST"])
 def channel():
@@ -50,14 +60,11 @@ def channel():
             pass
         else:       
             channels.append(channel)
-
     return render_template("index.html", user= session["user"], channels=channels ) 
-
 
 @app.route("/channel/<channel_name>",methods=["GET", "POST"])
 def channelpage(channel_name):
-    last_chanel.append(channel_name)
-    print(last_chanel)
+    session['last_chanel'] = channel_name
     # return last 100 notes from selected channel
     if channel_name in notes:
         channel_notes = notes[channel_name]
@@ -65,7 +72,6 @@ def channelpage(channel_name):
         return render_template("channel.html", channel_name=channel_name, channel_notes=channel_notes, notes=notes)
     else:
         return render_template("channel.html", channel_name=channel_name)
-
 
 @socketio.on('message')
 def send_message(mes, d):
