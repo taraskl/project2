@@ -14,18 +14,21 @@ Session(app)
 
 channels = []
 notes ={}
+last_chanel=[]
 
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    # user = 
+    # login 
     if request.method == "POST":
         name = request.form.get("name")
         session["user"] = name
         return render_template("index.html", user= session["user"], channels=channels )
-
+    
     try:
-        return render_template("index.html", user= session["user"], channels=channels)
+        last = last_chanel[-1]
+        channel_notes = notes[last]
+        return render_template("channel.html", channel_name=last, channel_notes=channel_notes, notes=notes)
     except:
         return render_template("index.html", channels=channels)        
 
@@ -53,6 +56,8 @@ def channel():
 
 @app.route("/channel/<channel_name>",methods=["GET", "POST"])
 def channelpage(channel_name):
+    last_chanel.append(channel_name)
+    print(last_chanel)
     # return last 100 notes from selected channel
     if channel_name in notes:
         channel_notes = notes[channel_name]
@@ -69,7 +74,6 @@ def send_message(mes, d):
     data.append(mes)
     data.append(d)
     data.append(user)
-    print(data)
 
     send(data, broadcast=True)   
 

@@ -6,7 +6,7 @@
         var socket = io.connect('http://127.0.0.1:5000');
 
         socket.on('message', function(data) {
-            $("#messages").append('<li>'+data[1]+', '+data[2]+'</br>'+data[0]+'</li>');
+            $("#messages").append('<li>'+data[1]+', '+data[2]+':'+'</br>'+' - '+data[0]+'</li>');
             console.log('Received message');
         });
 
@@ -35,22 +35,22 @@
             var channel = article.dataset.channel;
             var index= messages.length
             socket.emit('delete message', channel, index);
-
         });    
     });
-
 </script>
-
-<h4 id="channel" data-channel="{{ channel_name }}"> Your channel: {{ channel_name }} </h4>
-
 {% endblock %}
 {% block body %}    
+
+<h4 id="channel" data-channel="{{ channel_name }}"> Your channel: <span style="color:red;">{{ channel_name }} </span></h4>
+<form action="{{ url_for('channel') }}" method="get">
+    <button>Main page</button>
+</form>
 
 <h2>Notes:</h2>
 <ul id="messages">
     {% if channel_notes %}
         {% for k, v in channel_notes.items() %}
-                <li> {{ v.date }}, {{ v.user }} </br> {{ v.text }} </li>
+                <li> {{ v.date }}, {{ v.user }}: </br> - {{ v.text }} </li>
         {% endfor %}
     {% endif %}
 </ul>

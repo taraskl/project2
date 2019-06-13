@@ -6,7 +6,7 @@
 
 {% block body %}
 	{% if user %}
-	    <p>Hello {{ user }}</p>
+	    <p>Hello {{ user }}!</p>
 	    <form action="{{ url_for('logout') }}" method="get">
 	        <button>Logout</button>
 	    </form>
@@ -18,20 +18,18 @@
                     {{ channel }}</a></li>
 	        {% endfor %}
 	    </ul>
-
+		{{ last_chanel }}
 	    <h4> Create a new channel </h4>
 	    <form action="{{ url_for('channel') }}" method="post">
 	    	<input type="text" name="channel" placeholder="New channel">
 	        <button>New channel</button>
 	    </form>
 
-	    {{ channels }}
-
     {% else %}
-	    <h4>Pleas login</h4>
 	    <form action="{{ url_for('index') }}" method="post">
-	        <input type="text" name="name" placeholder="Enter Your Name">
-	        <button>Login</button>
+	    	<h4>Pleas login</h4>
+	        <input type="text" name="name" placeholder="Enter Your Name"></br>
+	        <button>Login</button><button>Sign up</button>
 	    </form>
     {% endif %}
 {% endblock %}

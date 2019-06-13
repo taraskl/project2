@@ -1,16 +1,14 @@
 {% extends "layout.html" %}
 
 {% block heading %}
-    Registration
+    <h1>Registration</h1>h1>
 {% endblock %}
 
 {% block body %}
-
     <ul>
         {% for user in users %}
             <li>{{ user }}</li>
         {% endfor %}
-
     </ul>
 
     <form action="{{ url_for('registration') }}" method="post">
